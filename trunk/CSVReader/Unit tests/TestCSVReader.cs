@@ -241,5 +241,32 @@ more text with ÙÚÞāΨΤΉeĉ special characters,99.33,xyz,.05, ,0,false,TRUE
                 }
             }
         }
+
+        [Test]
+        public void TestUTF8SpecialChar()
+        {
+            DataTable table = CSVReader.ReadCSVFile(AppDomain.CurrentDomain.BaseDirectory + @"\Unit tests\UTF8-specialchar.csv", true);
+
+            List<string> columns = new List<string>() { "ééééésetnb", "first", "middle", "last", "name1", "name2", "name3", "name4", "medline_search1" };
+
+            int i = 0;
+            foreach (DataColumn column in table.Columns)
+            {
+                Assert.AreEqual(columns[i++], column.ColumnName);
+            }
+
+            expectedRows = new List<List<object>>() {
+                new List<object>() { "A6212654", "Joe", "K.", "Margolis", "margolis rk", "", "", "", "(\"margolis rk\"[au] AND 1968:1998[dp])" },
+                new List<object>() { "A6212655", "Renée", "K.", "Margolis", "margolis rk", "", "", "", "(\"margolis rk\"[au] AND 1968:1998[dp])" },
+            };
+
+            i = 0;
+            foreach (List<object> list in expectedRows)
+            {
+                DataRow row = table.Rows[i++];
+                for (int c = 0; c < list.Count; c++)
+                    Assert.AreEqual(list[c], row[c]);
+            }
+        }
     }
 }

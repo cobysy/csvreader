@@ -56,6 +56,11 @@
     <Compile Include="Unit tests\TestCSVReader.cs" />
     <Compile Include="Unit tests\TestStringConverter.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Unit tests\UTF8-specialchar.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

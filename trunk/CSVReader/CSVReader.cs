@@ -44,10 +44,12 @@ namespace Com.StellmanGreene.CSVReader
     /// </summary>
     public class CSVReader : IDisposable
     {
+        public const string NEWLINE = "\r\n";
+
         /// <summary>
         /// This reader will read all of the CSV data
         /// </summary>
-        private TextReader reader;
+        private BinaryReader reader;
 
         /// <summary>
         /// The number of rows to scan for types when building a DataTable (0 to scan the whole file)
@@ -65,7 +67,7 @@ namespace Com.StellmanGreene.CSVReader
             if (csvFileInfo == null)
                 throw new ArgumentNullException("Null FileInfo passed to CSVReader");
 
-            this.reader = new StreamReader(csvFileInfo.FullName);
+            this.reader = new BinaryReader(File.OpenRead(csvFileInfo.FullName));
         }
 
         /// <summary>
@@ -77,7 +79,8 @@ namespace Com.StellmanGreene.CSVReader
             if (csvData == null)
                 throw new ArgumentNullException("Null string passed to CSVReader");
 
-            this.reader = new StringReader(csvData);
+
+            this.reader = new BinaryReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(csvData)));
         }
 
         /// <summary>
@@ -89,7 +92,7 @@ namespace Com.StellmanGreene.CSVReader
             if (reader == null)
                 throw new ArgumentNullException("Null TextReader passed to CSVReader");
 
-            this.reader = reader;
+            this.reader = new BinaryReader(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(reader.ReadToEnd())));
         }
 
         #endregion
@@ -103,12 +106,19 @@ namespace Com.StellmanGreene.CSVReader
         /// <returns>A list of objects read from the row, or null if there is no next row</returns>
         public List<object> ReadRow()
         {
-            // Read the next line
-            currentLine = reader.ReadLine();
-
             // ReadLine() will return null if there's no next line
-            if (currentLine == null)
+            if (reader.BaseStream.Position >= reader.BaseStream.Length)
                 return null;
+            
+            // Read the next line
+            currentLine = "";
+            while ((reader.BaseStream.Position < reader.BaseStream.Length) && (!currentLine.EndsWith(NEWLINE)))
+            {
+                char c = reader.ReadChar();
+                currentLine += c;
+            }
+            if (currentLine.EndsWith(NEWLINE))
+                currentLine = currentLine.Remove(currentLine.IndexOf(NEWLINE), NEWLINE.Length);
 
             // Build the list of objects in the line
             List<object> objects = new List<object>();
@@ -138,7 +148,7 @@ namespace Com.StellmanGreene.CSVReader
             bool foundEnd = false;
             while (!foundEnd && i <= len)
             {
-                // Check if we've hit the end of the strin
+                // Check if we've hit the end of the string
                 if ((!quoted && i == len) // non-quoted strings end with a comma or end of line
                     || (!quoted && currentLine.Substring(i, 1) == ",")
                     // quoted strings end with a quote followed by a comma or end of line
@@ -274,7 +284,14 @@ namespace Com.StellmanGreene.CSVReader
         public void Dispose()
         {
             if (reader != null)
-                reader.Dispose();
+            {
+                try
+                {
+                    // Can't call BinaryReader.Dispose due to its protection level
+                    reader.Close();
+                }
+                catch { }
+            }
         }
 
         #endregion

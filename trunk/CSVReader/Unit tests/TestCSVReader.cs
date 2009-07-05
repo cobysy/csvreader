@@ -44,7 +44,7 @@ namespace Com.StellmanGreene.CSVReader.Unit_tests
     public class TestCSVReader
     {
         string fileContents = @"text field,123.456,""quoted """" field"",10446744073709551616,x,1,true,false,FALSE,99999999999,.000000001,""10""
-more text,99.33,xyz,.05, ,0,false,TRUE,true,1000,1.46,xyz";
+more text with ÙÚÞāΨΤΉeĉ special characters,99.33,xyz,.05, ,0,false,TRUE,true,1000,1.46,xyz";
         List<List<object>> expectedRows = null;
 
         string filename = "testfile.csv";
@@ -58,7 +58,7 @@ more text,99.33,xyz,.05, ,0,false,TRUE,true,1000,1.46,xyz";
             short s = 1000;
             expectedRows = new List<List<object>>() {
                 new List<object>() { "text field", 123.456F, "quoted \" field", u, 'x', b1, true, false, false, 99999999999, .000000001F, "10" },
-                new List<object> () {"more text", 99.33F, "xyz", .05F, ' ', b2, false, true, true, s, 1.46F, "xyz" },
+                new List<object> () {"more text with ÙÚÞāΨΤΉeĉ special characters", 99.33F, "xyz", .05F, ' ', b2, false, true, true, s, 1.46F, "xyz" },
             };
         }
 

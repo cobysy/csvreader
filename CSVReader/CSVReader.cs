@@ -36,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Data;
+using System.Text;
 
 namespace Com.StellmanGreene.CSVReader
 {
@@ -109,14 +110,17 @@ namespace Com.StellmanGreene.CSVReader
             // ReadLine() will return null if there's no next line
             if (reader.BaseStream.Position >= reader.BaseStream.Length)
                 return null;
-            
+
+            StringBuilder builder = new StringBuilder();
+
             // Read the next line
-            currentLine = "";
-            while ((reader.BaseStream.Position < reader.BaseStream.Length) && (!currentLine.EndsWith(NEWLINE)))
+            while ((reader.BaseStream.Position < reader.BaseStream.Length) && (!builder.ToString().EndsWith(NEWLINE)))
             {
                 char c = reader.ReadChar();
-                currentLine += c;
+                builder.Append(c);
             }
+
+            currentLine = builder.ToString();
             if (currentLine.EndsWith(NEWLINE))
                 currentLine = currentLine.Remove(currentLine.IndexOf(NEWLINE), NEWLINE.Length);
 

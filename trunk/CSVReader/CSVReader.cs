@@ -46,6 +46,11 @@ namespace Com.StellmanGreene.CSVReader
     public class CSVReader : IDisposable
     {
         public const string NEWLINE = "\r\n";
+        public const string COMMASEP = ",";
+        public const string SEMICOLONSEP = ";";
+
+        // Field Separator (default is comma)
+        private static string FieldSep = COMMASEP;
 
         /// <summary>
         /// This reader will read all of the CSV data
@@ -154,10 +159,10 @@ namespace Com.StellmanGreene.CSVReader
             {
                 // Check if we've hit the end of the string
                 if ((!quoted && i == len) // non-quoted strings end with a comma or end of line
-                    || (!quoted && currentLine.Substring(i, 1) == ",")
+                    || (!quoted && currentLine.Substring(i, 1) == FieldSep)
                     // quoted strings end with a quote followed by a comma or end of line
                     || (quoted && i == len - 1 && currentLine.EndsWith("\""))
-                    || (quoted && currentLine.Substring(i, 2) == "\","))
+                    || (quoted && currentLine.Substring(i, 2) == "\"" + FieldSep))
                     foundEnd = true;
                 else
                     i++;
@@ -251,6 +256,33 @@ namespace Com.StellmanGreene.CSVReader
                     headerRead = true;
 
             return table;
+        }
+
+        /// <summary>
+        /// Read a CSV file into a table
+        /// </summary>
+        /// <param name="filename">Filename of CSV file</param>
+        /// <param name="headerRow">True if the first row contains column names</param>
+        /// <param name="scanRows">The number of rows to scan for types when building a DataTable (0 to scan the whole file)</param>
+        /// <param name="fieldSeparator">The field separator character</param>
+        /// <returns>System.Data.DataTable object that contains the CSV data</returns>
+        public static DataTable ReadCSVFile(string filename, bool headerRow, int scanRows, String fieldSeparator)
+        {
+            FieldSep = fieldSeparator;
+            return ReadCSVFile(filename, headerRow, scanRows);
+        }
+
+        /// <summary>
+        /// Read a CSV file into a table
+        /// </summary>
+        /// <param name="filename">Filename of CSV file</param>
+        /// <param name="headerRow">True if the first row contains column names</param>
+        /// <param name="fieldSeparator">The field separator character</param>
+        /// <returns>System.Data.DataTable object that contains the CSV data</returns>
+        public static DataTable ReadCSVFile(string filename, bool headerRow, String fieldSeparator)
+        {
+            FieldSep = fieldSeparator;
+            return ReadCSVFile(filename, headerRow);
         }
 
         /// <summary>
